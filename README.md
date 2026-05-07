@@ -1,4 +1,4 @@
-# The Postdoc — Assignment 2
+# The Know-It-All Postdoc
 
 ## What this is
 
