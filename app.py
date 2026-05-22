@@ -3,7 +3,7 @@ from langchain_core.messages import HumanMessage, AIMessage
 from dotenv import load_dotenv
 import os
 
-from assignment_chat.main import get_graph
+from main import get_graph
 
 # Load API keys — run this from the 05_src/ directory
 load_dotenv(".secrets")

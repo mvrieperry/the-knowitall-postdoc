@@ -2,24 +2,23 @@ from langchain_core.tools import tool
 import chromadb
 from openai import OpenAI
 from dotenv import load_dotenv
-import os
+
+from llm_config import openai_kwargs
 
 load_dotenv(".secrets")
 
 # Connect to the existing persistent ChromaDB collection.
 # Run from the 05_src/ directory — that's where the relative path resolves from.
-chroma_client = chromadb.PersistentClient(path="assignment_chat/data/chroma_db")
+chroma_client = chromadb.PersistentClient(path="data/chroma_db")
 
 # Load the collection with no embedding function — the embeddings are already stored.
 # We'll embed queries manually and pass them in directly.
 collection = chroma_client.get_collection(name="pubmed_ai_drug_discovery")
 
-# OpenAI client via the course gateway — used to embed the user's query
-openai_client = OpenAI(
-    api_key="any_value",
-    base_url="https://k7uffyg03f.execute-api.us-east-1.amazonaws.com/prod/openai/v1",
-    default_headers={"x-api-key": os.getenv("API_GATEWAY_KEY")},
-)
+# OpenAI client used to embed the user's query. Uses real OpenAI if
+# OPENAI_API_KEY is set, otherwise the course gateway (see llm_config.py).
+# NOTE: must stay text-embedding-3-small to match how the collection was built.
+openai_client = OpenAI(**openai_kwargs())
 
 
 @tool

@@ -3,23 +3,19 @@ from langchain_openai import ChatOpenAI
 from langgraph.prebuilt.tool_node import ToolNode, tools_condition
 from langchain_core.messages import SystemMessage
 from dotenv import load_dotenv
-import os
 
-from assignment_chat.prompts import return_instructions
-from assignment_chat.tools_chroma import search_chroma_db
-from assignment_chat.tools_pubmed import search_pubmed_live
-from assignment_chat.tools_mcp import search_biorxiv_preprints
+from prompts import return_instructions
+from tools_chroma import search_chroma_db
+from tools_pubmed import search_pubmed_live
+from tools_mcp import search_biorxiv_preprints
+from llm_config import openai_kwargs
 
-# Load API keys — run this app from the 05_src/ directory
+# Load API keys — run this app from the repo root
 load_dotenv(".secrets")
 
-# Set up the language model using the course API gateway
-chat_agent = ChatOpenAI(
-    model="gpt-4o-mini",
-    openai_api_key="any_value",
-    openai_api_base="https://k7uffyg03f.execute-api.us-east-1.amazonaws.com/prod/openai/v1",
-    default_headers={"x-api-key": os.getenv("API_GATEWAY_KEY")},
-)
+# Set up the language model. Uses real OpenAI if OPENAI_API_KEY is set,
+# otherwise the course API gateway via API_GATEWAY_KEY (see llm_config.py).
+chat_agent = ChatOpenAI(model="gpt-4o-mini", **openai_kwargs())
 
 # Load the Postdoc persona system prompt
 instructions = return_instructions()
