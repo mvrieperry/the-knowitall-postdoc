@@ -12,6 +12,7 @@ def search_pubmed_live(query: str) -> str:
     Use this when the user wants to find papers, asks what's new about something,
     or says 'find me papers on X'.
     """
+    print(f"[TOOL] search_pubmed_live (live PubMed) | query={query!r}", flush=True)
     # Step 1: search PubMed for matching PMIDs
     search_handle = Entrez.esearch(
         db="pubmed",

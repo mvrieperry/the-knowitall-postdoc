@@ -8,6 +8,7 @@ def search_biorxiv_preprints(query: str) -> str:
     Use this when the user wants cutting-edge or bleeding-edge work,
     asks about preprints, or wants results too recent to be in the local collection.
     """
+    print(f"[TOOL] search_biorxiv_preprints (preprint search) | query={query!r}", flush=True)
     # Europe PMC has free keyword search across preprint servers (bioRxiv, medRxiv, etc.)
     # SRC:PPR filters to preprints only. No API key needed.
     url = "https://www.ebi.ac.uk/europepmc/webservices/rest/search"

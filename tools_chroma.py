@@ -26,6 +26,7 @@ def search_chroma_db(query: str) -> str:
     """Search the local collection of ~1000 AI/drug discovery abstracts using semantic similarity.
     Use this when the user asks what the literature says about a topic, or wants background on something.
     """
+    print(f"[TOOL] search_chroma_db (semantic search / embeddings) | query={query!r}", flush=True)
     # Embed the query manually using the same model the collection was built with
     query_embedding = openai_client.embeddings.create(
         input=[query],
