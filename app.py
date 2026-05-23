@@ -1,7 +1,7 @@
 import gradio as gr
 from langchain_core.messages import HumanMessage, AIMessage
 from dotenv import load_dotenv
-import os
+import re
 
 from main import get_graph
 
@@ -11,10 +11,9 @@ load_dotenv(".secrets")
 # Build the LangGraph graph (Postdoc persona, no tools yet)
 postdoc = get_graph()
 
-# Blocked topics — simple keyword check that fires before calling the LLM at all.
-# Maps a keyword (checked as substring of lowercased message) to an in-character refusal.
-# Note: this is intentionally simple. The system prompt is the main guardrail;
-# this just saves an API call for obvious cases.
+# Blocked topics — keyword check that fires before calling the LLM at all.
+# Matched as whole words (so "cat" won't trip on "publiCATions"). The system
+# prompt is the main guardrail; this just saves an API call for obvious cases.
 blocked_keywords = {
     "cat":        "I'm a computational biologist, not a vet. Try somewhere else.",
     "dog":        "I'm a computational biologist, not a vet. Try somewhere else.",
@@ -25,10 +24,10 @@ blocked_keywords = {
 
 
 def chat(message: str, history: list[dict]) -> str:
-    # Check for blocked topics before hitting the LLM
+    # Check for blocked topics before hitting the LLM (whole-word match)
     msg_lower = message.lower()
     for keyword, refusal in blocked_keywords.items():
-        if keyword in msg_lower:
+        if re.search(rf"\b{re.escape(keyword)}\b", msg_lower):
             return refusal
 
     # Convert Gradio's history format (list of dicts) into LangChain messages
