@@ -1,5 +1,5 @@
 import gradio as gr
-from langchain_core.messages import HumanMessage, AIMessage
+from langchain_core.messages import HumanMessage, AIMessage, ToolMessage
 from dotenv import load_dotenv
 import re
 
@@ -20,6 +20,13 @@ blocked_keywords = {
     "horoscope":  "I deal in p-values, not planets. Hard pass.",
     "zodiac":     "I deal in p-values, not planets. Hard pass.",
     "taylor swift": "Not in my PubMed search history. Moving on.",
+}
+
+# Friendly labels for the tool note shown above each answer in the browser.
+tool_labels = {
+    "search_pubmed_live":       "Live PubMed search",
+    "search_chroma_db":         "Semantic search (local embeddings)",
+    "search_biorxiv_preprints": "Preprint search (bioRxiv/medRxiv)",
 }
 
 
@@ -45,8 +52,15 @@ def chat(message: str, history: list[dict]) -> str:
     state = {"messages": langchain_messages}
     response = postdoc.invoke(state)
 
-    # The last message in the response is the model's reply
-    return response["messages"][-1].content
+    answer = response["messages"][-1].content
+
+    # Note which tool(s) the model called, in order, above the answer.
+    tools_used = [m.name for m in response["messages"] if isinstance(m, ToolMessage)]
+    if tools_used:
+        labels = [tool_labels.get(name, name) for name in tools_used]
+        answer = f"*Tool used: {', '.join(labels)}*\n\n{answer}"
+
+    return answer
 
 
 # Launch the Gradio chat interface
