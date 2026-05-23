@@ -53,7 +53,6 @@ def chat(message: str, history: list[dict]) -> str:
 # Launch the Gradio chat interface
 gr.ChatInterface(
     fn=chat,
-    type="messages",
     title="The Postdoc",
     description="A senior postdoc who has read everything in the AI/drug discovery literature. Ask about papers, methods, or what the field knows on a topic.",
 ).launch()
