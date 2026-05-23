@@ -57,8 +57,16 @@ def search_pubmed_live(query: str) -> str:
 
         journal = str(article.get("Journal", {}).get("Title", "Unknown journal"))
 
+        # PubDate usually has a "Year", but some records only carry a free-text
+        # "MedlineDate" (e.g. "2025 Jan-Feb"). Fall back through both, then to
+        # the electronic ArticleDate, so we rarely report "Unknown year".
         pub_date = article.get("Journal", {}).get("JournalIssue", {}).get("PubDate", {})
-        year = str(pub_date.get("Year", "Unknown year"))
+        year = pub_date.get("Year") or pub_date.get("MedlineDate")
+        if not year:
+            article_dates = article.get("ArticleDate", [])
+            if article_dates:
+                year = article_dates[0].get("Year")
+        year = str(year) if year else "Unknown year"
 
         author_list = article.get("AuthorList", [])
         authors = []
@@ -71,7 +79,8 @@ def search_pubmed_live(query: str) -> str:
 
         papers.append(
             f"Title: {title}\n"
-            f"Authors: {authors_str} | {journal}, {year} | PMID: {pmid}\n"
+            f"Authors: {authors_str}\n"
+            f"Year: {year} | Journal: {journal} | PMID: {pmid}\n"
             f"Abstract: {abstract_snippet}..."
         )
 
